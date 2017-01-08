@@ -12,12 +12,19 @@ import classNames from 'classnames';
 
 function getItems(count, height) {
 	var heights = [65, 110, 140, 65, 90, 65];
-	return range(count).map((value) => {
+
+	let items = range(count).map((value) => {
 		return {
 			value,
-			height: height || heights[random(0, heights.length - 1)]
+			height: height || heights[random(0, heights.length - 1)],
+			collection: 0
 		};
 	});
+
+
+	items.push({value: 'title', height: height, collection: 1})
+
+	return items;
 }
 
 const Handle = SortableHandle(() => <div className={style.handle}></div>);
@@ -204,19 +211,25 @@ const SortableInfiniteList = SortableContainer(({className, items, itemClass, so
 });
 
 const SortableList = SortableContainer(({className, items, itemClass, sortingIndex, shouldUseDragHandle, sortableHandlers}) => {
+	items = items.map(({value, height, disabled}, index) =>
+		<Item
+			key={`item-${value}`}
+			className={itemClass}
+			sortingIndex={sortingIndex}
+			index={index}
+			value={value}
+			height={height}
+			shouldUseDragHandle={shouldUseDragHandle}
+			disabled={disabled}
+		/>
+	)
+	// items.splice(4, 0, <h2 key="hello">title</h2>)
+
+	// console.log('items', items)
+
 	return (
 		<div className={className} {...sortableHandlers}>
-			{items.map(({value, height}, index) =>
-				<Item
-					key={`item-${value}`}
-					className={itemClass}
-					sortingIndex={sortingIndex}
-					index={index}
-					value={value}
-					height={height}
-					shouldUseDragHandle={shouldUseDragHandle}
-				/>
-			)}
+			{items}
 		</div>
 	);
 });
@@ -279,7 +292,7 @@ storiesOf('Basic Configuration', module)
 .add('Grid', () => {
 	return (
 		<div className={style.root}>
-			<ListWrapper component={SortableList} axis={'xy'} items={getItems(10, 110)} helperClass={style.stylizedHelper} className={classNames(style.list, style.stylizedList, style.grid)} itemClass={classNames(style.stylizedItem, style.gridItem)}/>
+			<ListWrapper component={SortableList} axis={'xy'} items={getItems(15, 110)} helperClass={style.stylizedHelper} className={classNames(style.list, style.stylizedList, style.grid)} itemClass={classNames(style.stylizedItem, style.gridItem)}/>
 		</div>
 	);
 })

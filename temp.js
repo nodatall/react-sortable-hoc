@@ -6,6 +6,7 @@ const SortableItem = SortableElement(({value}) => <li>{value}</li>);
 
 const SortableList = SortableContainer(({items, secondItemList}) => {
 	return (
+		console.log('hello')
 		<ul>
 			{items.map((value, index) =>
                 <SortableItem key={`item-${index}`} index={index} value={value} />
