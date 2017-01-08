@@ -170,11 +170,12 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 
 		handlePress = (e) => {
 			const active = this.manager.getActive();
+			console.log("Active", active);
 
 			if (active) {
 				const {axis, getHelperDimensions, helperClass, hideSortableGhost, onSortStart, useWindowAsScrollContainer} = this.props;
-				let {node, collection} = active;
-				const {index} = node.sortableInfo;
+				let {node } = active;
+				const {index, collection } = node.sortableInfo;
 				const margin = getElementMargin(node);
 
 				const containerBoundingRect = this.container.getBoundingClientRect();
@@ -191,7 +192,12 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 				this.boundingClientRect = node.getBoundingClientRect();
 				this.containerBoundingRect = containerBoundingRect;
 				this.index = index;
+				this.collection = collection;
+				this.newCollection = collection;
 				this.newIndex = index;
+
+				console.log("ThisCollection is", this.collection);
+				console.log("ThisIndex is", this.index);
 
 				this.axis = {
 					x: axis.indexOf('x') >= 0,
@@ -276,7 +282,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 			//const nodes = this.manager.refs[collection];
 			//console.log('nodes:', nodes)
 			const nodes = this.manager.getAll();
-			console.log("All NODES", nodes);
+			//console.log("All NODES", nodes);
 			for (let i = 0, len = nodes.length; i < len; i++) {
 				let node = nodes[i];
 				let el = node.node;
@@ -293,7 +299,8 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 				onSortEnd({
 					oldIndex: this.index,
 					newIndex: this.newIndex,
-					collection
+					newCollection: this.newCollection,
+					oldCollection: this.collection
 				}, e);
 			}
 
@@ -455,6 +462,10 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 			for (let i = 0, len = nodes.length; i < len; i++) {
 				let {node, edgeOffset} = nodes[i];
 				const index = node.sortableInfo.index;
+				const collection = node.sortableInfo.collection;
+
+				//console.log("entering for loop", node, node.sortableInfo);
+
 				const width = node.offsetWidth;
 				const height = node.offsetHeight;
 				const offset = {
@@ -520,7 +531,9 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 								translate.y = nextNode.edgeOffset.top - edgeOffset.top;
 							}
 							if (this.newIndex === null) {
+								//console.log("A");
 								this.newIndex = index;
+								this.newCollection = collection;
 							}
 						} else if (index > this.index
 							&& (((sortingOffset.left + offset.width >= edgeOffset.left) && (sortingOffset.top + offset.height >= edgeOffset.top))
@@ -536,39 +549,51 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 								translate.x = prevNode.edgeOffset.left - edgeOffset.left;
 								translate.y = prevNode.edgeOffset.top - edgeOffset.top;
 							}
+							//console.log("B");
 							this.newIndex = index;
+							this.newCollection = collection;
 						}
 					} else {
 						if (index > this.index && (sortingOffset.left + offset.width >= edgeOffset.left)) {
 							translate.x = -(this.width + this.marginOffset.x);
+							//console.log("C");
 							this.newIndex = index;
+							this.newCollection = collection;
 						}
 						else if (index < this.index && (sortingOffset.left <= edgeOffset.left + offset.width)) {
 							translate.x = this.width + this.marginOffset.x;
 							if (this.newIndex == null) {
+								//console.log("D");
 								this.newIndex = index;
+								this.newCollection = collection;
 							}
 						}
 					}
 				} else if (this.axis.y) {
 					if (index > this.index && (sortingOffset.top + offset.height >= edgeOffset.top)) {
 						translate.y = -(this.height + this.marginOffset.y);
+						//console.log("E");
 						this.newIndex = index;
+						this.newCollection = collection;
 					}
 					else if (index < this.index && (sortingOffset.top <= edgeOffset.top + offset.height)) {
 						translate.y = this.height + this.marginOffset.y;
 						if (this.newIndex == null) {
+							//console.log("F");
 							this.newIndex = index;
+							this.newCollection = collection;
 						}
 					}
 				}
 				node.style[`${vendorPrefix}Transform`] = `translate3d(${translate.x}px,${translate.y}px,0)`;
 			}
 
-			console.log("New Index - ", this.newIndex);
 			if (this.newIndex == null) {
+				//console.log("G");
 				this.newIndex = this.index;
+				this.newCollection = this.collection;
 			}
+			//console.log("New Index - ", this.newIndex, "in Collection:", this.newCollection, this.collection);
 		}
 
 		autoscroll = () => {

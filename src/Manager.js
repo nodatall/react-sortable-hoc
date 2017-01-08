@@ -19,7 +19,7 @@ export default class Manager {
 	}
 
 	getAll() {
-		console.log('this.refs + this.refs:', this.refs[0], this.refs[1])
+		//console.log('this.refs + this.refs:', this.refs[0], this.refs[1])
 		return ([].concat(this.refs[0], this.refs[1]))
 	}
 
