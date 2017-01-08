@@ -273,7 +273,10 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 				this.sortableGhost.style.visibility = '';
 			}
 
-			const nodes = this.manager.refs[collection];
+			//const nodes = this.manager.refs[collection];
+			//console.log('nodes:', nodes)
+			const nodes = this.manager.getAll();
+			console.log("All NODES", nodes);
 			for (let i = 0, len = nodes.length; i < len; i++) {
 				let node = nodes[i];
 				let el = node.node;
@@ -435,7 +438,10 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 
 		animateNodes() {
 			const {transitionDuration, hideSortableGhost} = this.props;
-			let nodes = this.manager.getOrderedRefs();
+			//let nodes = this.manager.getOrderedRefs();
+			let nodes = this.manager.getAll();
+
+			//console.log('nodes:', nodes)
 			const deltaScroll = {
 				left: this.scrollContainer.scrollLeft - this.initialScroll.left,
 				top: this.scrollContainer.scrollTop - this.initialScroll.top
@@ -559,6 +565,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 				node.style[`${vendorPrefix}Transform`] = `translate3d(${translate.x}px,${translate.y}px,0)`;
 			}
 
+			console.log("New Index - ", this.newIndex);
 			if (this.newIndex == null) {
 				this.newIndex = this.index;
 			}

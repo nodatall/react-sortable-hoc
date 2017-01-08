@@ -6,16 +6,19 @@ const Item = SortableElement(({ value }) =>
   <div>{ value }</div>);
 
 const List = SortableContainer(({ items }) => {
-  console.log('hello')
   return (
     <div>
-      { items.map(( value,index ) =>
-        <Item key   =  { `${Math.random()}` }
-              index =  { index }
-              value =  { value }
-              collection = { value % 2 }
-             />
-      )}
+      { items.map(( value,index ) => {
+        if ( value > 0 && value < 10 ) {
+          return (
+            <Item key   =  { `${Math.random()}` }
+            index =  { index }
+            value =  { value }
+            collection = { value % 2 } />
+          )
+        }
+        return <div key={ `${Math.random()}` }>{ value }</div>
+      })}
     </div>
   )
 }
@@ -23,13 +26,14 @@ const List = SortableContainer(({ items }) => {
 
 class VeryBasic extends Component {
   state = {
-    items: [1,3,5,2,4,6]
+    items: [1,3,5,'Elephant',2,4,6]
   }
   onSortEnd = ({oldIndex, newIndex}) => {
     this.setState({
       items: arrayMove(this.state.items, oldIndex, newIndex)
     });
   }
+
   render() {
     return (
       <List items     = {this.state.items}

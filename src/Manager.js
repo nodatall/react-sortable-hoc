@@ -18,6 +18,11 @@ export default class Manager {
 		}
 	}
 
+	getAll() {
+		console.log('this.refs + this.refs:', this.refs[0], this.refs[1])
+		return ([].concat(this.refs[0], this.refs[1]))
+	}
+
 	getActive() {
 		return find(this.refs[this.active.collection], ({node}) => node.sortableInfo.index == this.active.index);
 	}
