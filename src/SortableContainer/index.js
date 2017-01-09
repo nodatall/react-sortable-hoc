@@ -445,10 +445,8 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 
 		animateNodes() {
 			const {transitionDuration, hideSortableGhost} = this.props;
-			//let nodes = this.manager.getOrderedRefs();
 			let nodes = this.manager.getAll();
 
-			//console.log('nodes:', nodes)
 			const deltaScroll = {
 				left: this.scrollContainer.scrollLeft - this.initialScroll.left,
 				top: this.scrollContainer.scrollTop - this.initialScroll.top
@@ -464,7 +462,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 				const index = node.sortableInfo.index;
 				const collection = node.sortableInfo.collection;
 
-				//console.log("entering for loop", node, node.sortableInfo);
+				// console.log("entering for loop", node, node.sortableInfo);
 
 				const width = node.offsetWidth;
 				const height = node.offsetHeight;
@@ -493,13 +491,14 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 				}
 
 				// If the node is the one we're currently animating, skip it
-				if (index === this.index) {
+				if (index === this.index && collection === this.collection) {
 					if (hideSortableGhost) {
 						/*
 						 * With windowing libraries such as `react-virtualized`, the sortableGhost
 						 * node may change while scrolling down and then back up (or vice-versa),
 						 * so we need to update the reference to the new node just to be safe.
 						 */
+						 console.log('hiding node!', node)
 						this.sortableGhost = node;
 						node.style.visibility = 'hidden';
 					}
@@ -509,7 +508,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 				if (transitionDuration) {
 					node.style[`${vendorPrefix}TransitionDuration`] = `${transitionDuration}ms`;
 				}
-
+/*
 				if (this.axis.x) {
 					if (this.axis.y) {
 						// Calculations for a grid setup
@@ -569,7 +568,9 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 							}
 						}
 					}
-				} else if (this.axis.y) {
+				} else
+*/
+				if (this.axis.y) {
 					if (index > this.index && (sortingOffset.top + offset.height >= edgeOffset.top)) {
 						translate.y = -(this.height + this.marginOffset.y);
 						//console.log("E");
@@ -585,6 +586,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 						}
 					}
 				}
+
 				node.style[`${vendorPrefix}Transform`] = `translate3d(${translate.x}px,${translate.y}px,0)`;
 			}
 

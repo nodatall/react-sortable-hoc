@@ -1,5 +1,7 @@
 import find from 'lodash/find';
 import sortBy from 'lodash/sortBy';
+import map from 'lodash/map';
+import flatten from 'lodash/flatten'
 
 export default class Manager {
 	refs = {};
@@ -19,8 +21,11 @@ export default class Manager {
 	}
 
 	getAll() {
-		//console.log('this.refs + this.refs:', this.refs[0], this.refs[1])
-		return ([].concat(this.refs[0], this.refs[1]))
+		const collections = map( this.refs, list => list)
+		
+		return flatten( collections.map( collection => {
+			return sortBy( collection, ({node}) => node.sortableInfo.index )
+		}))
 	}
 
 	getActive() {
@@ -32,6 +37,9 @@ export default class Manager {
 	}
 
 	getOrderedRefs(collection = this.active.collection) {
+		console.log('collection in getOrderedRefs:', collection)
+		console.log('this.refs[collection]:', this.refs[collection])
+		console.log('Sort by result:', sortBy(this.refs[collection], ({node}) => node.sortableInfo.index) )
 		return sortBy(this.refs[collection], ({node}) => node.sortableInfo.index);
 	}
 }
