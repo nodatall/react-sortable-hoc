@@ -19,12 +19,19 @@ import classNames from 'classnames';
 
 function getItems(count, height) {
   var heights = [65, 110, 140, 65, 90, 65];
-  return range(count).map(value => {
+
+  const items = range(count).map((value) => {
     return {
       value,
       height: height || heights[random(0, heights.length - 1)],
+      collection: 0,
     };
   });
+
+
+  items.push({value: 'title', height: height, collection: 1});
+
+  return items;
 }
 
 const Handle = SortableHandle(() => <div className={style.handle} />);
@@ -54,7 +61,7 @@ const SortableList = SortableContainer(({
 }) => {
   return (
     <div className={className}>
-      {items.map(({value, height}, index) => (
+      {items.map(({value, height, disabled}, index) => (
         <Item
           key={`item-${value}`}
           className={itemClass}
@@ -62,6 +69,7 @@ const SortableList = SortableContainer(({
           value={value}
           height={height}
           shouldUseDragHandle={shouldUseDragHandle}
+          disabled={disabled}
         />
       ))}
     </div>
@@ -396,7 +404,7 @@ storiesOf('Basic Configuration', module)
         <ListWrapper
           component={SortableList}
           axis={'xy'}
-          items={getItems(10, 110)}
+          items={getItems(15, 110)}
           helperClass={style.stylizedHelper}
           className={classNames(style.list, style.stylizedList, style.grid)}
           itemClass={classNames(style.stylizedItem, style.gridItem)}

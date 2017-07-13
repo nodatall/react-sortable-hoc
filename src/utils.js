@@ -10,11 +10,26 @@ export function arrayMove(arr, previousIndex, newIndex) {
   return array;
 }
 
-export function omit(obj, ...keysToOmit) {
-  return Object.keys(obj).reduce((acc, key) => {
-    if (keysToOmit.indexOf(key) === -1) acc[key] = obj[key];
-    return acc;
-  }, {});
+export function arrayCollectionMove (collections, previousIndex, newIndex, previousCollectionName, newCollectionName) {
+
+  let updatedPreviousCollection = collections[previousCollectionName],
+      updatedNewCollection = collections[newCollectionName]
+
+  const movingItem = updatedPreviousCollection.splice(previousIndex, 1)
+
+  updatedNewCollection.splice(newIndex, 0, movingItem[0])
+
+  return Object.assign({}, collections, {
+    [previousCollectionName]: updatedPreviousCollection,
+    [newCollectionName]: updatedNewCollection
+  })
+}
+
+export function omit (obj, ...keysToOmit) {
+    return Object.keys(obj).reduce((acc, key) => {
+        if (keysToOmit.indexOf(key) === -1) acc[key] = obj[key];
+        return acc;
+    }, {});
 }
 
 export const events = {

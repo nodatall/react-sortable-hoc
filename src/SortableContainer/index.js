@@ -240,8 +240,8 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
           onSortStart,
           useWindowAsScrollContainer,
         } = this.props;
-        const {node, collection} = active;
-        const {index} = node.sortableInfo;
+        const {node} = active;
+        const {index, collection} = node.sortableInfo;
         const margin = getElementMargin(node);
 
         const containerBoundingRect = this.container.getBoundingClientRect();
@@ -259,6 +259,8 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
         this.containerBoundingRect = containerBoundingRect;
         this.index = index;
         this.newIndex = index;
+        this.collection = collection;
+        this.newCollection = collection;
 
         this.axis = {
           x: axis.indexOf('x') >= 0,
@@ -283,7 +285,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
         ]; // Convert NodeList to Array
 
         clonedFields.forEach((field, index) => {
-          if (field.type !== 'file' && fields[index]) {		
+          if (field.type !== 'file' && fields[index]) {
             field.value = fields[index].value;
           }
         });
@@ -392,7 +394,8 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
         this.sortableGhost.style.opacity = '';
       }
 
-      const nodes = this.manager.refs[collection];
+      // const nodes = this.manager.refs[collection];
+      const nodes = this.manager.getAll();
       for (let i = 0, len = nodes.length; i < len; i++) {
         const node = nodes[i];
         const el = node.node;
@@ -422,7 +425,8 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
           {
             oldIndex: this.index,
             newIndex: this.newIndex,
-            collection,
+            newCollection: this.newCollection,
+            oldCollection: this.collection
           },
           e
         );
@@ -513,7 +517,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 
     updatePosition(e) {
       const {lockAxis, lockToContainerEdges} = this.props;
-      
+
       const offset = this.getOffset(e);
       const translate = {
         x: offset.x - this.initialOffset.x,
@@ -561,7 +565,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 
     animateNodes() {
       const {transitionDuration, hideSortableGhost} = this.props;
-      const nodes = this.manager.getOrderedRefs();
+      const nodes = this.manager.getAll();
       const deltaScroll = {
         left: this.scrollContainer.scrollLeft - this.initialScroll.left,
         top: this.scrollContainer.scrollTop - this.initialScroll.top,
@@ -579,6 +583,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
       for (let i = 0, len = nodes.length; i < len; i++) {
         const {node} = nodes[i];
         const index = node.sortableInfo.index;
+        const collection = node.sortableInfo.collection;
         const width = node.offsetWidth;
         const height = node.offsetHeight;
         const offset = {
@@ -609,12 +614,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
 
         // If the node is the one we're currently animating, skip it
         if (index === this.index) {
-          if (hideSortableGhost) {
-            /*
-						 * With windowing libraries such as `react-virtualized`, the sortableGhost
-						 * node may change while scrolling down and then back up (or vice-versa),
-						 * so we need to update the reference to the new node just to be safe.
-						 */
+          if (hideSortableGhost && collection === this.collection) {
             this.sortableGhost = node;
             node.style.visibility = 'hidden';
             node.style.opacity = 0;
@@ -654,6 +654,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
               }
               if (this.newIndex === null) {
                 this.newIndex = index;
+                this.newCollection = collection;
               }
             } else if (
               index > this.index &&
@@ -677,6 +678,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
                 translate.y = prevNode.edgeOffset.top - edgeOffset.top;
               }
               this.newIndex = index;
+              this.newCollection = collection;
             }
           } else {
             if (
@@ -685,6 +687,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
             ) {
               translate.x = -(this.width + this.marginOffset.x);
               this.newIndex = index;
+              this.newCollection = collection;
             } else if (
               index < this.index &&
               (sortingOffset.left + scrollDifference.left) <= edgeOffset.left + offset.width
@@ -692,6 +695,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
               translate.x = this.width + this.marginOffset.x;
               if (this.newIndex == null) {
                 this.newIndex = index;
+                this.newCollection = collection;
               }
             }
           }
@@ -702,6 +706,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
           ) {
             translate.y = -(this.height + this.marginOffset.y);
             this.newIndex = index;
+            this.newCollection = collection;
           } else if (
             index < this.index &&
             (sortingOffset.top + scrollDifference.top) <= edgeOffset.top + offset.height
@@ -709,6 +714,7 @@ export default function sortableContainer(WrappedComponent, config = {withRef: f
             translate.y = this.height + this.marginOffset.y;
             if (this.newIndex == null) {
               this.newIndex = index;
+              this.newCollection = collection;
             }
           }
         }
